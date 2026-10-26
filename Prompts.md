@@ -78,4 +78,35 @@
    - Browser subagent validation verified archive open/close, reword action, copy action, and theme switching.
    - Comprehensive `README.md` created with setup steps, Gemini free key instructions, and security guide.
 
+## Entry 4: GitHub Pages Blank Screen Diagnosis & Automated Deployment Workflow
+
+### User Prompt
+> My Vite + React app "Inkwell" is deployed on GitHub Pages but shows a blank white page (the tab title loads, nothing renders).
+> Live URL: https://vinayak2922k.github.io/Inkwell-Artisanal-AI-Cover-Letter-Studio/
+> Repo name: Inkwell-Artisanal-AI-Cover-Letter-Studio
+> Diagnose and fix this end to end...
+
+### Diagnosis
+- The default Vite build emitted root-relative asset paths (`/assets/index-xxx.js`), which on GitHub Pages resolved to `https://vinayak2922k.github.io/assets/...` instead of `https://vinayak2922k.github.io/Inkwell-Artisanal-AI-Cover-Letter-Studio/assets/...`, triggering 404 errors for scripts and styles and leaving a blank white page.
+
+### Actions & Fixes
+1. **Configured Base Path (`vite.config.js`)**:
+   - Set `base: '/Inkwell-Artisanal-AI-Cover-Letter-Studio/'` ensuring all assets, scripts, stylesheets, and workers bundle with the correct repository path prefix.
+2. **Asset Path Audit & PDF Worker Compatibility**:
+   - Audited all files for hardcoded root-relative paths (`/assets`, `/favicon`, etc.).
+   - Updated `index.html` script tag to `./src/main.jsx`.
+   - Verified `pdfjs-dist` worker URL resolves under `/Inkwell-Artisanal-AI-Cover-Letter-Studio/assets/pdf.worker.min-...mjs`.
+3. **Automated GitHub Pages Workflow (`.github/workflows/deploy.yml`)**:
+   - Created workflow triggered on push to `main` and `workflow_dispatch`.
+   - Configured Node.js 20 with npm caching, `npm ci`, and `npm run build` with `VITE_GEMINI_API_KEY: ${{ secrets.VITE_GEMINI_API_KEY }}`.
+   - Configured `actions/upload-pages-artifact` (`./dist`) and `actions/deploy-pages`.
+   - Granted necessary permissions: `contents: read`, `pages: write`, `id-token: write`.
+4. **Security Scan**:
+   - Confirmed `.env` is git-ignored, `.env.example` has placeholder only, and scanned git log confirms 0 secret keys committed.
+5. **Local Validation**:
+   - Built production bundle with `npm run build`.
+   - Verified locally via `npm run preview -- --port 4173` on `http://localhost:4173/Inkwell-Artisanal-AI-Cover-Letter-Studio/`.
+   - Confirmed full UI rendering with zero console errors and zero 404s.
+
+
 
