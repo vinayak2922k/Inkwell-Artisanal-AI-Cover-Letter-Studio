@@ -34,7 +34,11 @@ export function buildTemplateLetter(data = {}) {
     confident: `Dear Hiring Team at ${company},\n\nGreat teams are rarely built on templates; they are built by people who take genuine ownership of their craft. That is the conviction I bring to the ${role} role at ${company}. Having observed how your team solves problems with clarity and ambition, I am eager to put my background directly in service of your next milestones.`,
   };
 
-  const bodyParagraph1 = `Over the course of my career as ${name}, I have focused on delivering substance over rhetoric. My everyday toolkit centers on ${primarySkills}${complementarySkill}. Rather than treating these as abstract proficiencies, I apply them to untangle complex requirements, build resilient systems, and ensure every detail serves a clear, demonstrable purpose.`;
+  const resumeHighlight = (data.resumeText || '').trim()
+    ? ` As highlighted in my attached record, ${data.resumeText.trim().slice(0, 180).replace(/\s+/g, ' ')}.`
+    : '';
+
+  const bodyParagraph1 = `Over the course of my career as ${name}, I have focused on delivering substance over rhetoric. My everyday toolkit centers on ${primarySkills}${complementarySkill}.${resumeHighlight} Rather than treating these as abstract proficiencies, I apply them to untangle complex requirements, build resilient systems, and ensure every detail serves a clear, demonstrable purpose.`;
 
   const bodyParagraph2 = `What draws me particularly to ${company} is the standard of work you put into the world. In taking on the responsibilities of ${role}, my focus will be on shortening the distance between strategy and reality—collaborating closely with your team, listening attentively, and executing with quiet consistency.`;
 

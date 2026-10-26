@@ -52,4 +52,17 @@ describe('buildTemplateLetter', () => {
     expect(letter).not.toMatch(/unleash/i);
     expect(letter).not.toMatch(/seamless/i);
   });
+
+  it('incorporates resumeText highlights when attached', () => {
+    const letter = buildTemplateLetter({
+      name: 'Marcus Bell',
+      role: 'Site Reliability Engineer',
+      company: 'Cloudflare',
+      skills: ['Kubernetes', 'Go'],
+      resumeText: 'Maintained 99.999% uptime across 40 global points of presence.',
+    });
+
+    expect(letter).toContain('Maintained 99.999% uptime');
+    expect(letter).toContain('As highlighted in my attached record');
+  });
 });
