@@ -47,6 +47,14 @@ export async function generateCoverLetter({
     );
   }
 
+  const trimmedKey = apiKey.trim();
+  if (!trimmedKey.startsWith('AIzaSy')) {
+    throw new GeminiError(
+      `The key in .env starts with "${trimmedKey.slice(0, 3)}...", but Google Gemini API keys always start with "AIzaSy". In Google AI Studio, click "Create API key" and copy the 39-character key that starts with AIzaSy.`,
+      'INVALID_KEY_FORMAT'
+    );
+  }
+
   const { systemInstruction, userPrompt } = buildCoverLetterPrompt({
     name,
     role,
@@ -178,6 +186,13 @@ async function callGeminiViaRest(apiKey, systemInstruction, userPrompt, previous
       throw new GeminiError(
         'Gemini rate limit reached on free tier. Please wait a moment before trying again.',
         'RATE_LIMIT'
+      );
+    }
+    if (response.status === 404) {
+      throw new GeminiError(
+        'Gemini model returned 404 (Not Found). This happens when the key is not an AI Studio API key or lacks Generative Language API permissions. Please create a key at https://aistudio.google.com/app/apikey.',
+        'MODEL_NOT_FOUND',
+        errorBody
       );
     }
     if (response.status === 403 || response.status === 400) {
