@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
+import { ResumeDropzone } from './ResumeDropzone';
 
 /**
  * NotepadForm renders a vintage notepad stationery sheet with underlined inputs,
- * real human microcopy, stamped skill tags, and validation.
+ * real human microcopy, stamped skill tags, PDF resume docket, and validation.
  */
 export function NotepadForm({
   formData,
@@ -11,6 +12,9 @@ export function NotepadForm({
   isLoading,
   mode,
   errors = {},
+  currentResume,
+  onResumeExtracted,
+  onResumeRemoved,
 }) {
   const [tagInput, setTagInput] = useState('');
 
@@ -179,8 +183,15 @@ export function NotepadForm({
             )}
           </div>
 
+          {/* Resume PDF Docket Dropzone */}
+          <ResumeDropzone
+            onResumeExtracted={onResumeExtracted}
+            onResumeRemoved={onResumeRemoved}
+            currentResume={currentResume}
+          />
+
           {/* Tone Selector */}
-          <div className="form-field">
+          <div className="form-field" style={{ marginTop: '1.5rem' }}>
             <label className="form-field__label">Tone of Voice</label>
             <span className="form-field__microcopy">Set the temper of the parchment</span>
             <div className="tone-selector" role="radiogroup" aria-label="Tone of voice">

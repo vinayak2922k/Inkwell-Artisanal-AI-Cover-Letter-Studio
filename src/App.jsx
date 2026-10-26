@@ -3,8 +3,11 @@ import { Header } from './components/Header';
 import { NotepadForm } from './components/NotepadForm';
 import { LetterCard } from './components/LetterCard';
 import { DeskBanner } from './components/DeskBanner';
+import { HistoryDrawer } from './components/HistoryDrawer';
 import { buildTemplateLetter } from './lib/templateLetter';
 import { generateCoverLetter } from './lib/gemini';
+
+const HISTORY_STORAGE_KEY = 'inkwell_history';
 
 export function App() {
   // Theme state: daylight or dark charcoal desk
@@ -25,6 +28,20 @@ export function App() {
     resumeText: '',
   });
 
+  // Attached PDF resume docket
+  const [currentResume, setCurrentResume] = useState(null);
+
+  // Drafts history from localStorage
+  const [history, setHistory] = useState(() => {
+    try {
+      const saved = localStorage.getItem(HISTORY_STORAGE_KEY);
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [errors, setErrors] = useState({});
   const [letterText, setLetterText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -36,6 +53,15 @@ export function App() {
     localStorage.setItem('inkwell_theme', theme);
   }, [theme]);
 
+  // Sync history to localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(history));
+    } catch (e) {
+      console.warn('Unable to persist history', e);
+    }
+  }, [history]);
+
   // Initial letter generation on mount with demo values
   useEffect(() => {
     const initialLetter = buildTemplateLetter(formData);
@@ -44,6 +70,54 @@ export function App() {
 
   const toggleTheme = () => {
     setTheme((prev) => (prev === 'light' ? 'dark' : 'light'));
+  };
+
+  const handleResumeExtracted = (resumeData) => {
+    setCurrentResume(resumeData);
+    setFormData((prev) => ({
+      ...prev,
+      resumeText: resumeData.text,
+    }));
+  };
+
+  const handleResumeRemoved = () => {
+    setCurrentResume(null);
+    setFormData((prev) => ({
+      ...prev,
+      resumeText: '',
+    }));
+  };
+
+  const saveToHistory = (text, customFormData = formData) => {
+    if (!text || text.trim().length === 0) return;
+    const newEntry = {
+      id: `${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+      timestamp: Date.now(),
+      name: customFormData.name,
+      role: customFormData.role,
+      company: customFormData.company,
+      tone: customFormData.tone,
+      letterText: text,
+      mode: mode,
+    };
+    setHistory((prev) => [newEntry, ...prev.slice(0, 19)]); // store up to 20 past drafts
+  };
+
+  const handleRestoreFromHistory = (item) => {
+    setFormData((prev) => ({
+      ...prev,
+      name: item.name || prev.name,
+      role: item.role || prev.role,
+      company: item.company || prev.company,
+      tone: item.tone || prev.tone,
+    }));
+    setLetterText(item.letterText);
+    setApiError(null);
+  };
+
+  const handleClearHistory = () => {
+    setHistory([]);
+    localStorage.removeItem(HISTORY_STORAGE_KEY);
   };
 
   const validateForm = () => {
@@ -79,6 +153,7 @@ export function App() {
       setTimeout(() => {
         const generated = buildTemplateLetter(formData);
         setLetterText(generated);
+        saveToHistory(generated);
         setIsLoading(false);
       }, 400);
       return;
@@ -96,6 +171,7 @@ export function App() {
       });
 
       setLetterText(generated);
+      saveToHistory(generated);
     } catch (err) {
       setApiError(err);
     } finally {
@@ -113,6 +189,7 @@ export function App() {
     setApiError(null);
     const generated = buildTemplateLetter(formData);
     setLetterText(generated);
+    saveToHistory(generated);
   };
 
   const rawKey = import.meta.env.VITE_GEMINI_API_KEY;
@@ -128,6 +205,8 @@ export function App() {
         }}
         theme={theme}
         onToggleTheme={toggleTheme}
+        onOpenHistory={() => setIsHistoryOpen(true)}
+        historyCount={history.length}
       />
 
       <main className="desk-workspace">
@@ -140,6 +219,9 @@ export function App() {
             isLoading={isLoading}
             mode={mode}
             errors={errors}
+            currentResume={currentResume}
+            onResumeExtracted={handleResumeExtracted}
+            onResumeRemoved={handleResumeRemoved}
           />
         </div>
 
@@ -154,9 +236,19 @@ export function App() {
             error={apiError}
             onRetry={handleGenerate}
             onSwitchToTemplate={handleSwitchToTemplate}
+            onRegenerate={handleGenerate}
           />
         </div>
       </main>
+
+      {/* LocalStorage History Drawer */}
+      <HistoryDrawer
+        isOpen={isHistoryOpen}
+        onClose={() => setIsHistoryOpen(false)}
+        history={history}
+        onRestore={handleRestoreFromHistory}
+        onClear={handleClearHistory}
+      />
     </>
   );
 }

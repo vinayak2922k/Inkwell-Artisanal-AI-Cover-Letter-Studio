@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { InkLoader } from './InkLoader';
 import { ErrorNotice } from './ErrorNotice';
+import { formatLetterContent } from '../lib/markdown';
 
 /**
  * LetterCard displays the finalized cover letter on an artisanal stationery sheet,
  * styled with subtle paper grain, 1° tilt that straightens on hover, wax seal badge,
- * and ink-fill copy button with fallback. Supports loading (InkLoader) and error states.
+ * sanitized markdown-to-HTML rendering, and ink-fill copy button with fallback.
  */
 export function LetterCard({
   letterText,
@@ -17,6 +18,7 @@ export function LetterCard({
   error,
   onRetry,
   onSwitchToTemplate,
+  onRegenerate,
 }) {
   const [copied, setCopied] = useState(false);
 
@@ -73,7 +75,8 @@ export function LetterCard({
     URL.revokeObjectURL(url);
   };
 
-  const paragraphs = letterText ? letterText.split(/\n\s*\n/).filter(Boolean) : [];
+  // Convert model's markdown into clean, sanitized HTML paragraphs via DOMPurify
+  const sanitizedHtml = letterText ? formatLetterContent(letterText) : '';
   const wordCount = letterText ? letterText.trim().split(/\s+/).filter(Boolean).length : 0;
   const formattedDate = new Intl.DateTimeFormat('en-US', {
     month: 'long',
@@ -109,14 +112,15 @@ export function LetterCard({
           </div>
         </div>
 
-        {/* Dynamic Display: InkLoader while drafting, paragraphs when ready, or placeholder */}
+        {/* Dynamic Display: InkLoader while drafting, sanitized prose when ready, or placeholder */}
         {isLoading ? (
           <InkLoader />
-        ) : paragraphs.length > 0 ? (
+        ) : sanitizedHtml ? (
           <div className="letter-content" id="letter-content-body">
-            {paragraphs.map((p, idx) => (
-              <p key={idx}>{p}</p>
-            ))}
+            <div
+              className="letter-prose"
+              dangerouslySetInnerHTML={{ __html: sanitizedHtml }}
+            />
 
             {/* Wax Seal / Stamp badge */}
             <div className="wax-seal" title="Sealed at the Inkwell Desk" aria-hidden="true">
@@ -145,13 +149,26 @@ export function LetterCard({
           </div>
 
           <div className="letter-toolbar__actions">
+            {onRegenerate && (
+              <button
+                type="button"
+                className="btn-desk-tool"
+                onClick={onRegenerate}
+                id="btn-regenerate-letter"
+                title="Draft another variation with the same details"
+              >
+                <span>↺ Reword</span>
+              </button>
+            )}
+
             <button
               type="button"
               className="btn-desk-tool"
               onClick={downloadTextFile}
+              id="btn-download-txt"
               title="Download letter as .txt file"
             >
-              <span>💾 Download .txt</span>
+              <span>💾 .txt</span>
             </button>
 
             {/* Custom ink-fill Copy button */}

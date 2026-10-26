@@ -4,7 +4,14 @@ import React from 'react';
  * Header component for Inkwell's writer desk.
  * Includes branding, mode toggle (Template / AI), and theme switcher.
  */
-export function Header({ mode, onModeChange, theme, onToggleTheme }) {
+export function Header({
+  mode,
+  onModeChange,
+  theme,
+  onToggleTheme,
+  onOpenHistory,
+  historyCount = 0,
+}) {
   return (
     <header className="desk-header">
       <div className="desk-header__inner">
@@ -38,6 +45,18 @@ export function Header({ mode, onModeChange, theme, onToggleTheme }) {
               AI (Gemini)
             </button>
           </div>
+
+          {/* Archives Drawer Button */}
+          <button
+            id="open-history-btn"
+            type="button"
+            className="btn-desk-tool"
+            onClick={onOpenHistory}
+            title="Open archived drafts"
+            aria-label="Open letter archives"
+          >
+            <span>🗄️ Archives {historyCount > 0 ? `(${historyCount})` : ''}</span>
+          </button>
 
           {/* Theme Switcher */}
           <button

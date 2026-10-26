@@ -51,3 +51,31 @@
    - `npm run build` completed with 0 errors.
    - End-to-end browser subagent test: validated mode switching, missing key handling, error presentation, and clean fallback recovery to template mode.
 
+## Entry 3: Phase 3 — SaaS Features & Production Polish
+
+### Actions & Architecture
+1. **Resume PDF Text Extraction (`src/lib/pdfExtractor.js`)**:
+   - Browser-side PDF parsing using `pdfjs-dist` with worker asset URL configured for Vite.
+   - Enforces 5 MB file size limit and strict PDF type validation.
+   - Normalizes whitespace, extracts multi-page text, and caps payload at 3000 characters to prevent context overflow.
+2. **Resume Docket Component (`src/components/ResumeDropzone.jsx`)**:
+   - Stationery-styled docket pocket supporting drag & drop and click-to-upload.
+   - Animated extraction indicator ("Scanning parchment with PDF optics...").
+   - Stamped file chip displaying filename, formatted size (KB/MB), word count preview, and one-click removal button.
+   - Injects extracted resume background into Gemini prompt.
+3. **Markdown to Clean HTML Parser & Sanitizer (`src/lib/markdown.js`)**:
+   - Converts markdown bold/italic and paragraphs into semantic HTML.
+   - Strips raw hashtags (`#`) and markdown fences.
+   - Rigorous XSS protection via `DOMPurify` allowing only safe typography tags.
+   - Unit tests created in `src/tests/markdown.test.js` (**all 11 tests passing across suites**).
+4. **Stationery Archives Drawer (`src/components/HistoryDrawer.jsx`)**:
+   - Saves drafted letters into `localStorage` with timestamp, company, role, tone, and full text.
+   - Slide-in stationery archive drawer to review, reword, and restore previous drafts.
+   - Clear archive option.
+5. **Quality & Security Assurance**:
+   - Complete Vitest suite passed: 11 tests across 3 files.
+   - Production bundle compiled with zero errors (`npm run build`).
+   - Browser subagent validation verified archive open/close, reword action, copy action, and theme switching.
+   - Comprehensive `README.md` created with setup steps, Gemini free key instructions, and security guide.
+
+
