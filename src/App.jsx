@@ -4,6 +4,7 @@ import { NotepadForm } from './components/NotepadForm';
 import { LetterCard } from './components/LetterCard';
 import { DeskBanner } from './components/DeskBanner';
 import { HistoryDrawer } from './components/HistoryDrawer';
+import { Footer } from './components/Footer';
 import { buildTemplateLetter } from './lib/templateLetter';
 import { generateCoverLetter } from './lib/gemini';
 
@@ -240,6 +241,8 @@ export function App() {
           />
         </div>
       </main>
+
+      <Footer />
 
       {/* LocalStorage History Drawer */}
       <HistoryDrawer

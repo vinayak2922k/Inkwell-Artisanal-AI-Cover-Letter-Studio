@@ -1330,6 +1330,140 @@ body::before {
   justify-content: flex-end;
 }
 
+/* ==========================================================================
+   Writer's Desk Footer & Creator Colophon
+   ========================================================================== */
+.desk-footer {
+  background: var(--paper-notepad);
+  border-top: 1px solid var(--paper-border);
+  margin-top: auto;
+  position: relative;
+  z-index: 10;
+  box-shadow: 0 -2px 10px rgba(27, 26, 23, 0.03);
+}
+
+.desk-footer__inner {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2.25rem 1.5rem 1.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+  justify-content: space-between;
+}
+
+@media (min-width: 768px) {
+  .desk-footer__inner {
+    flex-direction: row;
+    align-items: center;
+  }
+}
+
+.desk-footer__brand {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.desk-footer__mark {
+  font-size: 1.6rem;
+  line-height: 1;
+}
+
+.desk-footer__title {
+  font-family: var(--font-serif);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-ink);
+  display: block;
+}
+
+.desk-footer__subtitle {
+  font-family: var(--font-sans);
+  font-size: 0.82rem;
+  color: var(--color-ink-muted);
+  margin-top: 0.15rem;
+}
+
+.desk-footer__colophon {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+@media (min-width: 768px) {
+  .desk-footer__colophon {
+    align-items: flex-end;
+  }
+}
+
+.desk-footer__byline {
+  font-family: var(--font-sans);
+  font-size: 0.88rem;
+  color: var(--color-ink-faint);
+}
+
+.desk-footer__byline strong {
+  color: var(--color-vermilion);
+  font-weight: 700;
+}
+
+.desk-footer__links {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+}
+
+.footer-link-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  background: var(--color-stamp-bg);
+  color: var(--color-ink);
+  border: 1px solid var(--paper-border);
+  padding: 0.35rem 0.75rem;
+  border-radius: 3px;
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  text-decoration: none;
+  letter-spacing: 0.03em;
+  transition: all var(--transition-smooth);
+}
+
+.footer-link-badge:hover {
+  border-color: var(--color-vermilion);
+  color: var(--color-vermilion);
+  background: var(--color-vermilion-tint);
+  transform: translateY(-1px);
+}
+
+.footer-link-badge:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+.desk-footer__bottom {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 1rem 1.5rem 1.5rem;
+  border-top: 1px dashed var(--color-ink-rule);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--color-ink-muted);
+}
+
+@media (min-width: 768px) {
+  .desk-footer__bottom {
+    flex-direction: row;
+    align-items: center;
+  }
+}
+
 /* Accessibility: Prefers Reduced Motion */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
