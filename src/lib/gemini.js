@@ -4,9 +4,9 @@ import { buildCoverLetterPrompt } from './prompt.js';
 /**
  * Inkwell — Gemini API Client
  *
- * Secure client for generating artisanal cover letters using Google Gemini free tier.
- * Never logs or prints the API key. Handles missing keys, 429 rate limits, network
- * drops, and timeouts gracefully.
+ * Secure client for generating artisanal cover letters using Google Gemini.
+ * Never logs or prints the API key. Supports multi-model fallback across
+ * modern flash models, 429 rate limits, and network errors.
  */
 
 export class GeminiError extends Error {
@@ -17,6 +17,14 @@ export class GeminiError extends Error {
     this.details = details;
   }
 }
+
+// Ordered list of candidate models for resilience across Google AI Studio tiers
+const CANDIDATE_MODELS = [
+  'gemini-flash-lite-latest',
+  'gemini-3-flash-preview',
+  'gemini-2.5-flash',
+  'gemini-1.5-flash',
+];
 
 /**
  * Calls Google Gemini to author a bespoke cover letter.
@@ -47,14 +55,6 @@ export async function generateCoverLetter({
     );
   }
 
-  const trimmedKey = apiKey.trim();
-  if (!trimmedKey.startsWith('AIzaSy')) {
-    throw new GeminiError(
-      `The key in .env starts with "${trimmedKey.slice(0, 3)}...", but Google Gemini API keys always start with "AIzaSy". In Google AI Studio, click "Create API key" and copy the 39-character key that starts with AIzaSy.`,
-      'INVALID_KEY_FORMAT'
-    );
-  }
-
   const { systemInstruction, userPrompt } = buildCoverLetterPrompt({
     name,
     role,
@@ -65,7 +65,7 @@ export async function generateCoverLetter({
   });
 
   try {
-    // 25-second timeout controller
+    // 30-second timeout controller
     const timeoutPromise = new Promise((_, reject) =>
       setTimeout(
         () =>
@@ -75,39 +75,42 @@ export async function generateCoverLetter({
               'TIMEOUT'
             )
           ),
-        25000
+        30000
       )
     );
 
     const callPromise = (async () => {
-      try {
-        const genAI = new GoogleGenerativeAI(apiKey.trim());
-        // Use gemini-1.5-flash which is widely supported on the free tier
-        const model = genAI.getGenerativeModel({
-          model: 'gemini-1.5-flash',
-          systemInstruction: systemInstruction,
-          generationConfig: {
-            temperature: 0.7,
-            topP: 0.9,
-            maxOutputTokens: 900,
-          },
-        });
+      const cleanKey = apiKey.trim();
+      let lastError = null;
 
-        const response = await model.generateContent(userPrompt);
-        const text = response?.response?.text();
+      // Try SDK first across candidate models
+      for (const modelName of CANDIDATE_MODELS) {
+        try {
+          const genAI = new GoogleGenerativeAI(cleanKey);
+          const model = genAI.getGenerativeModel({
+            model: modelName,
+            systemInstruction: systemInstruction,
+            generationConfig: {
+              temperature: 0.7,
+              topP: 0.9,
+              maxOutputTokens: 900,
+            },
+          });
 
-        if (!text || text.trim().length === 0) {
-          throw new GeminiError(
-            'Received an empty draft from the AI model. Please retry.',
-            'EMPTY_RESPONSE'
-          );
+          const response = await model.generateContent(userPrompt);
+          const text = response?.response?.text();
+
+          if (text && text.trim().length > 0) {
+            return text.trim();
+          }
+        } catch (err) {
+          lastError = err;
+          // Continue to next model on 404/503/400
         }
-
-        return text.trim();
-      } catch (sdkError) {
-        // Fallback to direct REST API if SDK encounters any transport issues
-        return await callGeminiViaRest(apiKey.trim(), systemInstruction, userPrompt, sdkError);
       }
+
+      // If SDK pass fails, attempt direct REST fallback with candidate models
+      return await callGeminiViaRest(cleanKey, systemInstruction, userPrompt, lastError);
     })();
 
     return await Promise.race([callPromise, timeoutPromise]);
@@ -151,68 +154,62 @@ export async function generateCoverLetter({
 }
 
 /**
- * Direct REST fallback for Google Gemini v1beta endpoint
+ * Direct REST fallback for Google Gemini v1beta endpoint with model rotation
  */
 async function callGeminiViaRest(apiKey, systemInstruction, userPrompt, previousError) {
-  const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+  let lastResponseText = '';
 
-  const payload = {
-    system_instruction: {
-      parts: [{ text: systemInstruction }],
-    },
-    contents: [
-      {
-        role: 'user',
-        parts: [{ text: userPrompt }],
-      },
-    ],
-    generationConfig: {
-      temperature: 0.7,
-      maxOutputTokens: 900,
-    },
-  };
+  for (const modelName of CANDIDATE_MODELS) {
+    try {
+      const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
 
-  const response = await fetch(endpoint, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(payload),
-  });
+      const payload = {
+        system_instruction: {
+          parts: [{ text: systemInstruction }],
+        },
+        contents: [
+          {
+            role: 'user',
+            parts: [{ text: userPrompt }],
+          },
+        ],
+        generationConfig: {
+          temperature: 0.7,
+          maxOutputTokens: 900,
+        },
+      };
 
-  if (!response.ok) {
-    const errorBody = await response.text();
-    if (response.status === 429) {
-      throw new GeminiError(
-        'Gemini rate limit reached on free tier. Please wait a moment before trying again.',
-        'RATE_LIMIT'
-      );
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (text && text.trim().length > 0) {
+          return text.trim();
+        }
+      } else {
+        lastResponseText = await response.text();
+        if (response.status === 429) {
+          throw new GeminiError(
+            'Gemini rate limit reached on free tier. Please wait a moment before trying again.',
+            'RATE_LIMIT'
+          );
+        }
+      }
+    } catch (e) {
+      if (e instanceof GeminiError) throw e;
+      // continue to next model
     }
-    if (response.status === 404) {
-      throw new GeminiError(
-        'Gemini model returned 404 (Not Found). This happens when the key is not an AI Studio API key or lacks Generative Language API permissions. Please create a key at https://aistudio.google.com/app/apikey.',
-        'MODEL_NOT_FOUND',
-        errorBody
-      );
-    }
-    if (response.status === 403 || response.status === 400) {
-      throw new GeminiError(
-        'Gemini request was rejected. Verify your API key in .env.',
-        'AUTH_ERROR'
-      );
-    }
-    throw new GeminiError(
-      `REST endpoint returned status ${response.status}`,
-      'REST_ERROR',
-      errorBody
-    );
   }
 
-  const data = await response.json();
-  const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-  if (!text) {
-    throw new GeminiError('Received empty content from Gemini REST.', 'EMPTY_RESPONSE');
-  }
-
-  return text.trim();
+  throw new GeminiError(
+    `Unable to generate letter with available Gemini models. ${lastResponseText || previousError?.message || ''}`,
+    'REST_ERROR'
+  );
 }
