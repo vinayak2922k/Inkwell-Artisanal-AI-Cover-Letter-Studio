@@ -4,6 +4,7 @@ import { NotepadForm } from './components/NotepadForm';
 import { LetterCard } from './components/LetterCard';
 import { DeskBanner } from './components/DeskBanner';
 import { buildTemplateLetter } from './lib/templateLetter';
+import { generateCoverLetter } from './lib/gemini';
 
 export function App() {
   // Theme state: daylight or dark charcoal desk
@@ -21,11 +22,13 @@ export function App() {
     company: 'Meridian Labs',
     skills: ['Design Systems', 'React Architecture', 'Cross-functional Leadership', 'TypeScript'],
     tone: 'confident',
+    resumeText: '',
   });
 
   const [errors, setErrors] = useState({});
   const [letterText, setLetterText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [apiError, setApiError] = useState(null);
 
   // Sync theme to DOM data-theme attribute
   useEffect(() => {
@@ -65,36 +68,64 @@ export function App() {
     return Object.keys(errs).length === 0;
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const handleGenerate = async () => {
     if (!validateForm()) return;
 
+    setApiError(null);
     setIsLoading(true);
 
     if (mode === 'template') {
-      // Simulate quick natural ink flow
+      // Natural typewriter delay for template mode
       setTimeout(() => {
         const generated = buildTemplateLetter(formData);
         setLetterText(generated);
         setIsLoading(false);
-      }, 350);
-    } else {
-      // Phase 2 will plug in Gemini here. For Phase 1 fallback with notice:
-      setTimeout(() => {
-        const generated = buildTemplateLetter(formData);
-        setLetterText(generated);
-        setIsLoading(false);
-      }, 500);
+      }, 400);
+      return;
+    }
+
+    // AI Mode via Gemini
+    try {
+      const generated = await generateCoverLetter({
+        name: formData.name,
+        role: formData.role,
+        company: formData.company,
+        skills: formData.skills,
+        resumeText: formData.resumeText,
+        tone: formData.tone,
+      });
+
+      setLetterText(generated);
+    } catch (err) {
+      setApiError(err);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const hasApiKey = Boolean(import.meta.env.VITE_GEMINI_API_KEY);
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    handleGenerate();
+  };
+
+  const handleSwitchToTemplate = () => {
+    setMode('template');
+    setApiError(null);
+    const generated = buildTemplateLetter(formData);
+    setLetterText(generated);
+  };
+
+  const rawKey = import.meta.env.VITE_GEMINI_API_KEY;
+  const hasApiKey = Boolean(rawKey && rawKey.trim() !== '' && !rawKey.includes('your_gemini_api_key_here'));
 
   return (
     <>
       <Header
         mode={mode}
-        onModeChange={setMode}
+        onModeChange={(newMode) => {
+          setMode(newMode);
+          setApiError(null);
+        }}
         theme={theme}
         onToggleTheme={toggleTheme}
       />
@@ -120,6 +151,9 @@ export function App() {
             targetCompany={formData.company}
             mode={mode}
             isLoading={isLoading}
+            error={apiError}
+            onRetry={handleGenerate}
+            onSwitchToTemplate={handleSwitchToTemplate}
           />
         </div>
       </main>

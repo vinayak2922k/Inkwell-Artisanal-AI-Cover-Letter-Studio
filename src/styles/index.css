@@ -811,6 +811,186 @@ body::before {
   background-color: var(--color-vermilion);
 }
 
+/* ==========================================================================
+   Ink Loader & Writing Animations
+   ========================================================================== */
+.ink-loader-stage {
+  min-height: 480px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 3rem 1.5rem;
+}
+
+.quill-animation-wrapper {
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.quill-icon {
+  font-size: 3.5rem;
+  line-height: 1;
+  display: inline-block;
+  transform-origin: 20% 80%;
+  animation: penWrite 1.8s ease-in-out infinite;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.15));
+}
+
+.ink-drop {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--color-vermilion);
+  margin-top: 0.25rem;
+  animation: inkDrip 1.8s ease-in infinite;
+  opacity: 0.85;
+}
+
+@keyframes penWrite {
+  0%, 100% {
+    transform: rotate(0deg) translateY(0);
+  }
+  25% {
+    transform: rotate(-10deg) translateY(-4px) translateX(-4px);
+  }
+  50% {
+    transform: rotate(8deg) translateY(2px) translateX(4px);
+  }
+  75% {
+    transform: rotate(-4deg) translateY(-2px);
+  }
+}
+
+@keyframes inkDrip {
+  0% {
+    transform: scale(0.4) translateY(-4px);
+    opacity: 0.2;
+  }
+  40% {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+  80% {
+    transform: scale(0.7) translateY(18px);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(0.3) translateY(24px);
+    opacity: 0;
+  }
+}
+
+.ink-status-container {
+  max-width: 440px;
+}
+
+.ink-status-text {
+  font-family: var(--font-serif);
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--color-ink);
+  line-height: 1.35;
+  margin-bottom: 0.5rem;
+  animation: statusFade 400ms ease-out;
+}
+
+.ink-status-subtext {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-ink-muted);
+}
+
+@keyframes statusFade {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ==========================================================================
+   Error Notice (Stationery Stumbled)
+   ========================================================================== */
+.error-stationery {
+  border: 1px dashed var(--color-vermilion);
+  background: rgba(216, 71, 43, 0.04);
+  padding: 1.75rem 2rem;
+  border-radius: 3px;
+  margin-bottom: 2rem;
+  position: relative;
+}
+
+.error-stationery::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 4px;
+  background-color: var(--color-vermilion);
+}
+
+.error-stationery__header {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.75rem;
+}
+
+.error-stationery__icon {
+  font-size: 1.2rem;
+}
+
+.error-stationery__title {
+  font-family: var(--font-serif);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-vermilion);
+}
+
+.error-stationery__message {
+  font-family: var(--font-sans);
+  font-size: 0.95rem;
+  color: var(--color-ink);
+  line-height: 1.5;
+  margin-bottom: 1rem;
+}
+
+.error-stationery__hint {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  background: rgba(27, 26, 23, 0.04);
+  padding: 0.75rem 1rem;
+  border-radius: 2px;
+  margin-bottom: 1.25rem;
+  color: var(--color-ink-faint);
+  line-height: 1.5;
+}
+
+.error-stationery__hint code {
+  color: var(--color-vermilion);
+  background: rgba(216, 71, 43, 0.1);
+  padding: 0.15rem 0.35rem;
+  border-radius: 2px;
+}
+
+.error-stationery__actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
 /* Accessibility: Prefers Reduced Motion */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
@@ -821,4 +1001,9 @@ body::before {
   .letter-sheet {
     transform: none !important;
   }
+  .quill-icon,
+  .ink-drop {
+    animation: none !important;
+  }
 }
+

@@ -20,6 +20,7 @@ export function Header({ mode, onModeChange, theme, onToggleTheme }) {
           {/* Mode Switcher */}
           <div className="mode-toggle" role="group" aria-label="Generation Mode">
             <button
+              id="mode-btn-template"
               type="button"
               className={`mode-toggle__btn ${mode === 'template' ? 'active' : ''}`}
               onClick={() => onModeChange('template')}
@@ -28,6 +29,7 @@ export function Header({ mode, onModeChange, theme, onToggleTheme }) {
               Template
             </button>
             <button
+              id="mode-btn-ai"
               type="button"
               className={`mode-toggle__btn ${mode === 'ai' ? 'active' : ''}`}
               onClick={() => onModeChange('ai')}
@@ -39,6 +41,7 @@ export function Header({ mode, onModeChange, theme, onToggleTheme }) {
 
           {/* Theme Switcher */}
           <button
+            id="theme-toggle-btn"
             type="button"
             className="btn-desk-tool"
             onClick={onToggleTheme}

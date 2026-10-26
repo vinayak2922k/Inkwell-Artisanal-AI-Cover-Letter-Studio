@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
+import { InkLoader } from './InkLoader';
+import { ErrorNotice } from './ErrorNotice';
 
 /**
  * LetterCard displays the finalized cover letter on an artisanal stationery sheet,
  * styled with subtle paper grain, 1° tilt that straightens on hover, wax seal badge,
- * and ink-fill copy button with fallback.
+ * and ink-fill copy button with fallback. Supports loading (InkLoader) and error states.
  */
 export function LetterCard({
   letterText,
@@ -12,6 +14,9 @@ export function LetterCard({
   targetCompany,
   mode,
   isLoading,
+  error,
+  onRetry,
+  onSwitchToTemplate,
 }) {
   const [copied, setCopied] = useState(false);
 
@@ -78,6 +83,15 @@ export function LetterCard({
 
   return (
     <section className="letter-stage" aria-label="Letter Preview">
+      {/* If an error occurred during generation, display stationery notice */}
+      {error && (
+        <ErrorNotice
+          error={error}
+          onRetry={onRetry}
+          onSwitchToTemplate={onSwitchToTemplate}
+        />
+      )}
+
       <div className="letter-sheet" id="letter-sheet-card">
         {/* Stationery Header */}
         <div className="letter-header">
@@ -95,8 +109,10 @@ export function LetterCard({
           </div>
         </div>
 
-        {/* Letter Body or Empty State */}
-        {paragraphs.length > 0 ? (
+        {/* Dynamic Display: InkLoader while drafting, paragraphs when ready, or placeholder */}
+        {isLoading ? (
+          <InkLoader />
+        ) : paragraphs.length > 0 ? (
           <div className="letter-content" id="letter-content-body">
             {paragraphs.map((p, idx) => (
               <p key={idx}>{p}</p>
@@ -120,12 +136,12 @@ export function LetterCard({
       </div>
 
       {/* Toolbar beneath the paper sheet */}
-      {letterText && (
+      {!isLoading && letterText && (
         <div className="letter-toolbar">
           <div className="letter-meta-badge">
             <span>{wordCount} words</span>
             <span>·</span>
-            <span>{mode === 'ai' ? 'Drafted via AI' : 'Drafted via Template'}</span>
+            <span>{mode === 'ai' ? 'Drafted via Gemini' : 'Drafted via Template'}</span>
           </div>
 
           <div className="letter-toolbar__actions">

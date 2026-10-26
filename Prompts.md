@@ -23,3 +23,31 @@
    - Mode switcher ("Template Mode" / "AI Mode") with friendly setup banner for API key configuration.
    - Dark mode toggle supporting "Charcoal Desk & Cream Paper" palette.
 6. Added Vitest unit test suite covering `buildTemplateLetter` and edge cases.
+
+## Entry 2: Phase 2 — LLM Integration & Security
+
+### User Prompt
+> yes proceed for the phase 2
+
+### Actions & Architecture
+1. **Prompt Engineering Engine (`src/lib/prompt.js`)**:
+   - Master career coach persona with editorial guidelines.
+   - 4-tier structural composition: Hook (informed interest in target company), Proof (tangible impact & skills), Fit (connecting candidate craft to company mission), Close (grounded call to action).
+   - Strict ban on buzzwords & clichés (*"revolutionize", "unleash", "seamless", "synergy", "paradigm shift"*, etc.) and placeholders.
+   - Tone adaptation for Confident, Warm, and Formal stationery styles.
+   - Unit tests created in `src/tests/prompt.test.js` (**all 7 unit tests passing**).
+2. **Gemini API Integration & Client Hardening (`src/lib/gemini.js`)**:
+   - Primary `@google/generative-ai` integration targeting `gemini-1.5-flash` with direct REST API fallback.
+   - 25-second timeout controller, 429 rate limit detection, offline connection checking, and sanitized error classes (`GeminiError`).
+   - Zero API key logging or exposure: keys read strictly via `import.meta.env.VITE_GEMINI_API_KEY`.
+3. **UI States & Stationery Feedback**:
+   - `InkLoader` component: pen-writing / ink-drip animation with 6 rotating status lines.
+   - `ErrorNotice` component: "The Quill Stumbled" stationery alert with inline advice, "Try Again" action, and "Switch to Template Mode" fallback.
+   - Mode switcher connected in `App.jsx`, updating `DeskBanner` context dynamically.
+4. **Hardened Serverless Deployment (`api/generate.js`)**:
+   - Added serverless proxy for Vercel/Netlify holding `GEMINI_API_KEY` entirely server-side.
+5. **Testing & Quality Assurance**:
+   - Full Vitest suite passing (7/7 tests).
+   - `npm run build` completed with 0 errors.
+   - End-to-end browser subagent test: validated mode switching, missing key handling, error presentation, and clean fallback recovery to template mode.
+
