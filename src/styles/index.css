@@ -1,0 +1,824 @@
+/* ==========================================================================
+   INKWELL — A Writer's Desk Design System
+   Palette: Warm Paper (#F4EFE6), Deep Ink (#1B1A17), Burnt Vermilion (#D8472B)
+   Dark mode: Charcoal Desk (#18191B) with Cream Stationery (#F4EFE6)
+   ========================================================================== */
+
+:root {
+  /* Light Theme — Daylight Desk */
+  --bg-desk: #ECE6DC;
+  --bg-desk-grain: rgba(27, 26, 23, 0.03);
+  --paper-notepad: #FAF7F2;
+  --paper-letter: #FFFDF9;
+  --paper-border: #E2DACB;
+  --color-ink: #1B1A17;
+  --color-ink-faint: #636059;
+  --color-ink-muted: #8F8B82;
+  --color-ink-rule: rgba(27, 26, 23, 0.08);
+  --color-margin-rule: rgba(216, 71, 43, 0.22);
+  --color-vermilion: #D8472B;
+  --color-vermilion-hover: #BF3A20;
+  --color-vermilion-tint: rgba(216, 71, 43, 0.08);
+  --color-stamp-bg: #F0EAE1;
+  --color-stamp-border: #7F7A71;
+  --color-seal: #B32815;
+  --color-seal-gold: #D4AF37;
+  --color-focus-ring: #D8472B;
+
+  /* Elevation Shadows */
+  --shadow-paper: 0 4px 18px -4px rgba(27, 26, 23, 0.12),
+                  0 20px 38px -10px rgba(27, 26, 23, 0.08),
+                  0 1px 3px rgba(27, 26, 23, 0.06);
+  --shadow-paper-hover: 0 8px 24px -4px rgba(27, 26, 23, 0.14),
+                        0 28px 48px -12px rgba(27, 26, 23, 0.12),
+                        0 2px 6px rgba(27, 26, 23, 0.08);
+  --shadow-notepad: 0 6px 20px -3px rgba(27, 26, 23, 0.1),
+                    0 1px 2px rgba(27, 26, 23, 0.05);
+
+  /* Typography */
+  --font-serif: 'Fraunces', Georgia, 'Times New Roman', serif;
+  --font-sans: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'Space Mono', 'Courier New', monospace;
+
+  /* Transitions */
+  --transition-smooth: 240ms cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-paper: 360ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+[data-theme='dark'] {
+  /* Dark Theme — Charcoal Desk with Cream Paper */
+  --bg-desk: #141517;
+  --bg-desk-grain: rgba(255, 255, 255, 0.02);
+  --paper-notepad: #202226;
+  --paper-letter: #F6F1E7; /* Paper stays cream as requested */
+  --paper-border: #2D3036;
+  --color-ink: #F2EFE9;
+  --color-ink-faint: #A6A39D;
+  --color-ink-muted: #72706A;
+  --color-ink-rule: rgba(255, 255, 255, 0.07);
+  --color-margin-rule: rgba(216, 71, 43, 0.35);
+  --color-stamp-bg: #2A2D33;
+  --color-stamp-border: #9C968B;
+  --shadow-paper: 0 8px 30px -4px rgba(0, 0, 0, 0.45),
+                  0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-paper-hover: 0 12px 36px -4px rgba(0, 0, 0, 0.55),
+                        0 4px 12px rgba(0, 0, 0, 0.35);
+  --shadow-notepad: 0 6px 24px -4px rgba(0, 0, 0, 0.4);
+}
+
+/* ==========================================================================
+   Base Styles & Reset
+   ========================================================================== */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--bg-desk);
+  color: var(--color-ink);
+  line-height: 1.6;
+  min-height: 100vh;
+  position: relative;
+  transition: background-color var(--transition-smooth), color var(--transition-smooth);
+}
+
+/* Desk texture overlay */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image: radial-gradient(var(--bg-desk-grain) 1px, transparent 1px);
+  background-size: 18px 18px;
+  opacity: 0.8;
+  z-index: 0;
+}
+
+#root {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* ==========================================================================
+   Header & Desk Navigation
+   ========================================================================== */
+.desk-header {
+  border-bottom: 1px solid var(--paper-border);
+  background: var(--paper-notepad);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  box-shadow: 0 1px 4px rgba(27, 26, 23, 0.04);
+}
+
+.desk-header__inner {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0.9rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-decoration: none;
+  color: var(--color-ink);
+}
+
+.brand__mark {
+  font-size: 1.5rem;
+  line-height: 1;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.15));
+}
+
+.brand__title {
+  font-family: var(--font-serif);
+  font-size: 1.55rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.brand__tagline {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-ink-muted);
+  border-left: 1px solid var(--paper-border);
+  padding-left: 0.75rem;
+  margin-left: 0.25rem;
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .brand__tagline {
+    display: inline-block;
+  }
+}
+
+.desk-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* Mode Switcher Pill (Template / AI) */
+.mode-toggle {
+  display: inline-flex;
+  align-items: center;
+  background: var(--paper-border);
+  border-radius: 999px;
+  padding: 3px;
+  border: 1px solid rgba(27, 26, 23, 0.08);
+}
+
+.mode-toggle__btn {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 0.35rem 0.85rem;
+  border: none;
+  background: transparent;
+  color: var(--color-ink-faint);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all var(--transition-smooth);
+}
+
+.mode-toggle__btn.active {
+  background: var(--paper-notepad);
+  color: var(--color-vermilion);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.mode-toggle__btn:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 1px;
+}
+
+/* Theme Toggle Button */
+.btn-desk-tool {
+  background: transparent;
+  border: 1px solid var(--paper-border);
+  color: var(--color-ink);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  padding: 0.4rem 0.75rem;
+  border-radius: 4px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: all var(--transition-smooth);
+}
+
+.btn-desk-tool:hover {
+  background: rgba(27, 26, 23, 0.04);
+  border-color: var(--color-ink-muted);
+}
+
+.btn-desk-tool:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+}
+
+/* ==========================================================================
+   Main Desk Workspace (Split Screen Layout)
+   ========================================================================== */
+.desk-workspace {
+  flex: 1;
+  max-width: 1400px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 4rem;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2.5rem;
+  align-items: start;
+}
+
+@media (min-width: 1024px) {
+  .desk-workspace {
+    grid-template-columns: 480px 1fr;
+    gap: 3.5rem;
+    padding: 2.5rem 2rem 5rem;
+  }
+}
+
+@media (min-width: 1200px) {
+  .desk-workspace {
+    grid-template-columns: 520px 1fr;
+  }
+}
+
+/* ==========================================================================
+   Notepad Component (Left Column Form)
+   ========================================================================== */
+.notepad-sheet {
+  background: var(--paper-notepad);
+  border: 1px solid var(--paper-border);
+  border-radius: 3px;
+  box-shadow: var(--shadow-notepad);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Notepad Top Binding Strip */
+.notepad-binding {
+  background: #2D2721;
+  color: #EDE7DC;
+  padding: 0.65rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  border-bottom: 2px dashed rgba(255, 255, 255, 0.15);
+}
+
+.notepad-binding__perforation {
+  opacity: 0.6;
+}
+
+/* Notepad Content Area with red margin line */
+.notepad-body {
+  padding: 2rem 1.75rem 2.25rem 2.5rem;
+  position: relative;
+  background-image: repeating-linear-gradient(
+    transparent,
+    transparent 39px,
+    var(--color-ink-rule) 39px,
+    var(--color-ink-rule) 40px
+  );
+  background-position: 0 1rem;
+}
+
+/* Red Margin Rule on the Left */
+.notepad-body::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 1.8rem;
+  width: 1px;
+  background-color: var(--color-margin-rule);
+}
+
+.notepad-title {
+  font-family: var(--font-serif);
+  font-size: 1.75rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin-bottom: 0.4rem;
+  line-height: 1.2;
+}
+
+.notepad-subtitle {
+  font-size: 0.92rem;
+  color: var(--color-ink-faint);
+  margin-bottom: 2rem;
+}
+
+/* Underlined Form Fields (Stationery Style) */
+.form-field {
+  margin-bottom: 1.75rem;
+  position: relative;
+}
+
+.form-field__label {
+  display: block;
+  font-family: var(--font-serif);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-ink);
+  margin-bottom: 0.25rem;
+}
+
+.form-field__microcopy {
+  display: block;
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  color: var(--color-ink-muted);
+  margin-bottom: 0.4rem;
+}
+
+.form-input-underlined {
+  width: 100%;
+  border: none;
+  border-bottom: 1.5px solid var(--paper-border);
+  background: transparent;
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-size: 1.05rem;
+  padding: 0.4rem 0.2rem;
+  border-radius: 0;
+  transition: border-color var(--transition-smooth);
+}
+
+.form-input-underlined:focus {
+  outline: none;
+  border-bottom: 2px solid var(--color-focus-ring);
+  background: rgba(216, 71, 43, 0.02);
+}
+
+.form-input-underlined::placeholder {
+  color: var(--color-ink-muted);
+  font-style: italic;
+  opacity: 0.7;
+}
+
+.form-field__error {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--color-vermilion);
+  margin-top: 0.35rem;
+  letter-spacing: 0.02em;
+}
+
+/* Stamped Skill Tags Container */
+.skills-input-wrapper {
+  margin-top: 0.5rem;
+}
+
+.skills-tags-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.65rem;
+}
+
+.stamped-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.25rem 0.65rem;
+  background: var(--color-stamp-bg);
+  border: 1px dashed var(--color-stamp-border);
+  color: var(--color-ink);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-radius: 2px;
+  position: relative;
+  transform: rotate(-0.5deg);
+  transition: all var(--transition-smooth);
+  animation: stampDown 180ms ease-out forwards;
+}
+
+.stamped-chip:nth-child(even) {
+  transform: rotate(0.8deg);
+}
+
+.stamped-chip__remove {
+  background: none;
+  border: none;
+  color: var(--color-ink-muted);
+  cursor: pointer;
+  font-size: 0.9rem;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 0.1rem;
+  border-radius: 2px;
+}
+
+.stamped-chip__remove:hover {
+  color: var(--color-vermilion);
+}
+
+@keyframes stampDown {
+  0% {
+    opacity: 0;
+    transform: scale(1.15) rotate(2deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(-0.5deg);
+  }
+}
+
+/* Tone Radio Selector (Artisanal Stamps) */
+.tone-selector {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.4rem;
+}
+
+.tone-option {
+  flex: 1;
+  border: 1px solid var(--paper-border);
+  background: transparent;
+  color: var(--color-ink);
+  padding: 0.5rem 0.6rem;
+  border-radius: 3px;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all var(--transition-smooth);
+}
+
+.tone-option.active {
+  border-color: var(--color-vermilion);
+  background: var(--color-vermilion-tint);
+  color: var(--color-vermilion);
+  font-weight: 700;
+}
+
+/* Notepad Action Buttons */
+.notepad-actions {
+  margin-top: 2.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.btn-quill {
+  width: 100%;
+  background: var(--color-vermilion);
+  color: #FFFDF9;
+  font-family: var(--font-serif);
+  font-size: 1.15rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  padding: 0.85rem 1.5rem;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  box-shadow: 0 4px 14px rgba(216, 71, 43, 0.25);
+  transition: all var(--transition-smooth);
+}
+
+.btn-quill:hover:not(:disabled) {
+  background: var(--color-vermilion-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(216, 71, 43, 0.32);
+}
+
+.btn-quill:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.btn-quill:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.btn-quill:focus-visible {
+  outline: 3px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+/* ==========================================================================
+   Letter Preview on Stationery Paper (Right Column)
+   ========================================================================== */
+.letter-stage {
+  perspective: 1200px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.letter-sheet {
+  background-color: var(--paper-letter);
+  color: #1B1A17; /* Always dark ink on paper */
+  padding: 3rem 2.5rem 3.5rem;
+  border-radius: 2px;
+  box-shadow: var(--shadow-paper);
+  border: 1px solid rgba(27, 26, 23, 0.08);
+  position: relative;
+  transform: rotate(1deg);
+  transform-origin: center top;
+  transition: transform var(--transition-paper), box-shadow var(--transition-paper);
+}
+
+.letter-sheet:hover,
+.letter-sheet:focus-within {
+  transform: rotate(0deg);
+  box-shadow: var(--shadow-paper-hover);
+}
+
+/* Subtle paper texture */
+.letter-sheet::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: radial-gradient(rgba(27, 26, 23, 0.04) 1px, transparent 1px);
+  background-size: 24px 24px;
+  opacity: 0.5;
+}
+
+/* Letter Stationery Letterhead */
+.letter-header {
+  border-bottom: 1.5px solid rgba(27, 26, 23, 0.12);
+  padding-bottom: 1.5rem;
+  margin-bottom: 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  position: relative;
+  z-index: 2;
+}
+
+.letter-candidate-name {
+  font-family: var(--font-serif);
+  font-size: 1.85rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: #1B1A17;
+  line-height: 1.15;
+}
+
+.letter-candidate-role {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #636059;
+  margin-top: 0.25rem;
+}
+
+.letter-date {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: #8F8B82;
+  text-align: right;
+}
+
+/* Letter Body Prose */
+.letter-content {
+  font-family: var(--font-serif);
+  font-size: 1.08rem;
+  line-height: 1.8;
+  color: #24231E;
+  position: relative;
+  z-index: 2;
+}
+
+.letter-content p {
+  margin-bottom: 1.4rem;
+  text-align: justify;
+  text-justify: inter-word;
+}
+
+.letter-content p:last-child {
+  margin-bottom: 0;
+}
+
+/* Wax Seal Accent */
+.wax-seal {
+  position: absolute;
+  bottom: 2.2rem;
+  right: 2.5rem;
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #D8472B 0%, #A62512 70%, #681105 100%);
+  box-shadow: 0 4px 12px rgba(104, 17, 5, 0.4),
+              inset 0 2px 4px rgba(255, 255, 255, 0.3),
+              inset 0 -2px 5px rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #FFE6DB;
+  font-family: var(--font-serif);
+  font-size: 1.4rem;
+  font-weight: 700;
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  pointer-events: none;
+  z-index: 3;
+  animation: sealPress 500ms cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes sealPress {
+  0% {
+    transform: scale(2.2) rotate(15deg);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(0.9) rotate(-3deg);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+/* Letter Action Bar (Floating Stationery Tools) */
+.letter-toolbar {
+  margin-top: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.5rem 0.25rem;
+}
+
+.letter-meta-badge {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--color-ink-muted);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.letter-toolbar__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* Custom Ink-Fill Copy Button */
+.btn-copy-ink {
+  position: relative;
+  overflow: hidden;
+  background: var(--paper-notepad);
+  color: var(--color-ink);
+  border: 1px solid var(--paper-border);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.55rem 1.1rem;
+  border-radius: 3px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: border-color var(--transition-smooth), color var(--transition-smooth);
+}
+
+.btn-copy-ink__fill {
+  position: absolute;
+  inset: 0;
+  background: var(--color-ink);
+  transform: translateX(-100%);
+  transition: transform 300ms cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 0;
+}
+
+.btn-copy-ink.copied .btn-copy-ink__fill {
+  transform: translateX(0);
+}
+
+.btn-copy-ink.copied {
+  color: #FFFDF9;
+  border-color: var(--color-ink);
+}
+
+.btn-copy-ink span {
+  position: relative;
+  z-index: 1;
+}
+
+.btn-copy-ink:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+/* Empty State & Placeholder on Letter */
+.letter-placeholder {
+  min-height: 480px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 3rem 1.5rem;
+  border: 1.5px dashed var(--paper-border);
+  border-radius: 2px;
+  background: rgba(27, 26, 23, 0.015);
+}
+
+.letter-placeholder__icon {
+  font-size: 2.75rem;
+  color: var(--color-ink-muted);
+  margin-bottom: 1rem;
+  opacity: 0.7;
+}
+
+.letter-placeholder__heading {
+  font-family: var(--font-serif);
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: var(--color-ink);
+  margin-bottom: 0.5rem;
+}
+
+.letter-placeholder__text {
+  font-size: 0.92rem;
+  color: var(--color-ink-faint);
+  max-width: 360px;
+  margin-bottom: 1.5rem;
+}
+
+/* Mode Banner / Notice */
+.desk-banner {
+  background: var(--color-stamp-bg);
+  border: 1px solid var(--paper-border);
+  padding: 0.75rem 1.25rem;
+  margin-bottom: 1.5rem;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+}
+
+.desk-banner__status {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.desk-banner__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--color-vermilion);
+}
+
+/* Accessibility: Prefers Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .letter-sheet {
+    transform: none !important;
+  }
+}
