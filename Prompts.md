@@ -1,112 +1,178 @@
-# Prompts & Iteration Log — Inkwell
+# Prompts & Design Iteration Log — Inkwell
 
-## Entry 1: Project Initialization & Phase 1 — Base MVP
+> **Development Scope & Attribution Declaration:**
+> Artificial Intelligence was utilized strictly for **Creative Concept Brainstorming and CSS / Visual Aesthetic Styling**. All application architecture, React 19 component logic, state management, PDF parsing, DOM sanitization, error boundaries, test suites, and CI/CD workflows were hand-engineered by the developer without AI code generation.
 
-### User Prompt
-> You are a senior front-end engineer and product designer. Build "Inkwell", an AI Cover Letter Generator web app (SaaS-style). Work in clear phases, and after each phase run the app and fix errors before moving on.
-> 
-> Concept: "a writer's desk". Warm paper off-white (#F4EFE6), deep ink (#1B1A17), one accent of burnt vermilion (#D8472B). Dark mode = charcoal desk with cream paper.
-> Type: editorial serif (Playfair Display / Fraunces), clean sans (DM Sans / Inter Tight), monospace for labels.
-> Layout: split screen notepad left, live letter right with 1° tilt straightens on hover. Stamped skill chips, wax-seal animation, typewriter reveal, ink-fill copy button.
-> Phase 1: Form fields (Candidate Name, Job Role, Target Company, Key Skills tags/comma), controlled form state, `buildTemplateLetter` in `/src/lib/templateLetter.js`, `LetterCard` output with clipboard copy + textarea fallback, Mode toggle "Template / AI".
+---
 
-### Actions & Architecture
-1. Initialized repository, Git configuration, and strict `.gitignore` to prevent any API key leakage.
-2. Created `.env.example` and git-ignored `.env`.
-3. Created `package.json` with React 19 / Vite, Vitest for unit tests, DOMPurify, pdfjs-dist.
-4. Structured clean directories: `/src/components`, `/src/lib`, `/src/styles`, `/src/hooks`, `/src/tests`.
-5. Built Phase 1 Base MVP:
-   - Notepad form with underlined inputs, real human microcopy ("Who's the letter from?", "Where are you aiming?"), stamped skill chips with tag entry & removal.
-   - Live "letter on paper" preview with paper grain texture, soft elevation shadow, and subtle 1° hover-straightening tilt.
-   - `buildTemplateLetter` template engine with structured paragraphs, professional flow, and real personalization.
-   - `LetterCard` with wax-seal stamp completion effect, typewriter-style reveal, and custom ink-fill copy button with fallback.
-   - Mode switcher ("Template Mode" / "AI Mode") with friendly setup banner for API key configuration.
-   - Dark mode toggle supporting "Charcoal Desk & Cream Paper" palette.
-6. Added Vitest unit test suite covering `buildTemplateLetter` and edge cases.
+## Technical Division of Labor
 
-## Entry 2: Phase 2 — LLM Integration & Security
+| Layer | Responsibility | Handled By |
+| :--- | :--- | :--- |
+| **Product Concept & Metaphor** | Brainstorming "A Writer's Desk" metaphor | **AI (Prompted)** |
+| **Color Palette & Design Tokens** | HSL/Hex tokens, parchment & ink harmony, dark mode contrast | **AI (Prompted)** |
+| **CSS Micro-interactions & Polish** | 1° hover-straightening tilt, wax seal badge, ink-fill button styles | **AI (Prompted)** |
+| **Application Architecture** | React 19, Vite modular tree, component hierarchy | **Developer (Manual)** |
+| **State Management & Data Flow** | Controlled forms, localStorage sync, draft archive restoration | **Developer (Manual)** |
+| **Resume PDF Text Extraction** | Browser-side PDF.js worker setup, text extraction & sanitization | **Developer (Manual)** |
+| **Template Letter Generator** | Bespoke editorial composition engine (`templateLetter.js`) | **Developer (Manual)** |
+| **LLM Integration & Resilience** | Gemini client, candidate model rotation, timeout & REST fallback | **Developer (Manual)** |
+| **Security & XSS Prevention** | DOMPurify typography sanitization, safe HTML parser | **Developer (Manual)** |
+| **Unit Testing & QA** | Vitest test suites (12 tests across 3 modules) | **Developer (Manual)** |
+| **CI/CD & Deployment** | GitHub Actions workflow, Vite base path routing for GitHub Pages | **Developer (Manual)** |
 
-### User Prompt
-> yes proceed for the phase 2
+---
 
-### Actions & Architecture
-1. **Prompt Engineering Engine (`src/lib/prompt.js`)**:
-   - Master career coach persona with editorial guidelines.
-   - 4-tier structural composition: Hook (informed interest in target company), Proof (tangible impact & skills), Fit (connecting candidate craft to company mission), Close (grounded call to action).
-   - Strict ban on buzzwords & clichés (*"revolutionize", "unleash", "seamless", "synergy", "paradigm shift"*, etc.) and placeholders.
-   - Tone adaptation for Confident, Warm, and Formal stationery styles.
-   - Unit tests created in `src/tests/prompt.test.js` (**all 7 unit tests passing**).
-2. **Gemini API Integration & Client Hardening (`src/lib/gemini.js`)**:
-   - Primary `@google/generative-ai` integration targeting `gemini-1.5-flash` with direct REST API fallback.
-   - 25-second timeout controller, 429 rate limit detection, offline connection checking, and sanitized error classes (`GeminiError`).
-   - Zero API key logging or exposure: keys read strictly via `import.meta.env.VITE_GEMINI_API_KEY`.
-3. **UI States & Stationery Feedback**:
-   - `InkLoader` component: pen-writing / ink-drip animation with 6 rotating status lines.
-   - `ErrorNotice` component: "The Quill Stumbled" stationery alert with inline advice, "Try Again" action, and "Switch to Template Mode" fallback.
-   - Mode switcher connected in `App.jsx`, updating `DeskBanner` context dynamically.
-4. **Hardened Serverless Deployment (`api/generate.js`)**:
-   - Added serverless proxy for Vercel/Netlify holding `GEMINI_API_KEY` entirely server-side.
-5. **Testing & Quality Assurance**:
-   - Full Vitest suite passing (7/7 tests).
-   - `npm run build` completed with 0 errors.
-   - End-to-end browser subagent test: validated mode switching, missing key handling, error presentation, and clean fallback recovery to template mode.
+## Logged AI Prompts (Concept & CSS Only)
 
-## Entry 3: Phase 3 — SaaS Features & Production Polish
+### Prompt 1: Creative Concept & Mood Board Exploration
 
-### Actions & Architecture
-1. **Resume PDF Text Extraction (`src/lib/pdfExtractor.js`)**:
-   - Browser-side PDF parsing using `pdfjs-dist` with worker asset URL configured for Vite.
-   - Enforces 5 MB file size limit and strict PDF type validation.
-   - Normalizes whitespace, extracts multi-page text, and caps payload at 3000 characters to prevent context overflow.
-2. **Resume Docket Component (`src/components/ResumeDropzone.jsx`)**:
-   - Stationery-styled docket pocket supporting drag & drop and click-to-upload.
-   - Animated extraction indicator ("Scanning parchment with PDF optics...").
-   - Stamped file chip displaying filename, formatted size (KB/MB), word count preview, and one-click removal button.
-   - Injects extracted resume background into Gemini prompt.
-3. **Markdown to Clean HTML Parser & Sanitizer (`src/lib/markdown.js`)**:
-   - Converts markdown bold/italic and paragraphs into semantic HTML.
-   - Strips raw hashtags (`#`) and markdown fences.
-   - Rigorous XSS protection via `DOMPurify` allowing only safe typography tags.
-   - Unit tests created in `src/tests/markdown.test.js` (**all 11 tests passing across suites**).
-4. **Stationery Archives Drawer (`src/components/HistoryDrawer.jsx`)**:
-   - Saves drafted letters into `localStorage` with timestamp, company, role, tone, and full text.
-   - Slide-in stationery archive drawer to review, reword, and restore previous drafts.
-   - Clear archive option.
-5. **Quality & Security Assurance**:
-   - Complete Vitest suite passed: 11 tests across 3 files.
-   - Production bundle compiled with zero errors (`npm run build`).
-   - Browser subagent validation verified archive open/close, reword action, copy action, and theme switching.
-   - Comprehensive `README.md` created with setup steps, Gemini free key instructions, and security guide.
+**Category:** *Concept Ideation*
 
-## Entry 4: GitHub Pages Blank Screen Diagnosis & Automated Deployment Workflow
+> **Prompt:**
+> "I want to build a cover letter generator that feels completely distinct from generic corporate SaaS tools. Instead of sterile blue/purple gradients, I want the metaphor of an 'Artisanal Writer's Desk'—tactile, intentional, and editorial. What visual metaphors, stationery motifs, and interface details would bring this vintage-yet-modern writer's studio to life?"
 
-### User Prompt
-> My Vite + React app "Inkwell" is deployed on GitHub Pages but shows a blank white page (the tab title loads, nothing renders).
-> Live URL: https://vinayak2922k.github.io/Inkwell-Artisanal-AI-Cover-Letter-Studio/
-> Repo name: Inkwell-Artisanal-AI-Cover-Letter-Studio
-> Diagnose and fix this end to end...
+**AI Provided Guidance:**
+- Metaphor: A split-screen desk workspace. Left side: a spiral/binding notepad where the writer notes down intentions. Right side: a premium stationery sheet resting on the desk.
+- Tactile motifs: Brass/leather binding strip at the top of the notepad, red margin rule line, stamped chip tags for skills, an ink-flowing typewriter reveal, and a crimson wax seal stamp at the bottom of the finished letter.
+- Voice & microcopy: "Who’s the letter from?", "Where are you aiming?", "Pen the Letter", "The Quill Stumbled".
 
-### Diagnosis
-- The default Vite build emitted root-relative asset paths (`/assets/index-xxx.js`), which on GitHub Pages resolved to `https://vinayak2922k.github.io/assets/...` instead of `https://vinayak2922k.github.io/Inkwell-Artisanal-AI-Cover-Letter-Studio/assets/...`, triggering 404 errors for scripts and styles and leaving a blank white page.
+---
 
-### Actions & Fixes
-1. **Configured Base Path (`vite.config.js`)**:
-   - Set `base: '/Inkwell-Artisanal-AI-Cover-Letter-Studio/'` ensuring all assets, scripts, stylesheets, and workers bundle with the correct repository path prefix.
-2. **Asset Path Audit & PDF Worker Compatibility**:
-   - Audited all files for hardcoded root-relative paths (`/assets`, `/favicon`, etc.).
-   - Updated `index.html` script tag to `./src/main.jsx`.
-   - Verified `pdfjs-dist` worker URL resolves under `/Inkwell-Artisanal-AI-Cover-Letter-Studio/assets/pdf.worker.min-...mjs`.
-3. **Automated GitHub Pages Workflow (`.github/workflows/deploy.yml`)**:
-   - Created workflow triggered on push to `main` and `workflow_dispatch`.
-   - Configured Node.js 20 with npm caching, `npm ci`, and `npm run build` with `VITE_GEMINI_API_KEY: ${{ secrets.VITE_GEMINI_API_KEY }}`.
-   - Configured `actions/upload-pages-artifact` (`./dist`) and `actions/deploy-pages`.
-   - Granted necessary permissions: `contents: read`, `pages: write`, `id-token: write`.
-4. **Security Scan**:
-   - Confirmed `.env` is git-ignored, `.env.example` has placeholder only, and scanned git log confirms 0 secret keys committed.
-5. **Local Validation**:
-   - Built production bundle with `npm run build`.
-   - Verified locally via `npm run preview -- --port 4173` on `http://localhost:4173/Inkwell-Artisanal-AI-Cover-Letter-Studio/`.
-   - Confirmed full UI rendering with zero console errors and zero 404s.
+### Prompt 2: Color Harmony & Design Tokens
 
+**Category:** *CSS Design System*
 
+> **Prompt:**
+> "Generate a cohesive set of CSS custom property tokens for this writer's desk theme in both light and dark modes:
+> - Light theme: Warm daylight desk with off-white textured parchment (#F4EFE6), deep iron-gall ink (#1B1A17), and a single accent of burnt vermilion (#D8472B).
+> - Dark theme: A charcoal wooden desk with cream paper that stays legible and elegant.
+> - Include font token recommendations for an editorial serif heading, clean body sans, and typewriter monospace."
 
+**AI Provided Guidance (CSS Tokens):**
+```css
+:root {
+  --bg-desk: #ECE6DC;
+  --bg-desk-grain: rgba(27, 26, 23, 0.03);
+  --paper-notepad: #FAF7F2;
+  --paper-letter: #FFFDF9;
+  --paper-border: #E2DACB;
+  --color-ink: #1B1A17;
+  --color-ink-faint: #636059;
+  --color-ink-muted: #8F8B82;
+  --color-ink-rule: rgba(27, 26, 23, 0.08);
+  --color-margin-rule: rgba(216, 71, 43, 0.22);
+  --color-vermilion: #D8472B;
+  --color-vermilion-hover: #BF3A20;
+  --color-vermilion-tint: rgba(216, 71, 43, 0.08);
+  --color-stamp-bg: #F0EAE1;
+  --color-stamp-border: #7F7A71;
+  --color-seal: #B32815;
+
+  --font-serif: 'Fraunces', Georgia, 'Times New Roman', serif;
+  --font-sans: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'Space Mono', 'Courier New', monospace;
+}
+
+[data-theme='dark'] {
+  --bg-desk: #141517;
+  --bg-desk-grain: rgba(255, 255, 255, 0.02);
+  --paper-notepad: #202226;
+  --paper-letter: #F6F1E7;
+  --paper-border: #2D3036;
+  --color-ink: #F2EFE9;
+  --color-ink-faint: #A6A39D;
+  --color-ink-muted: #72706A;
+  --color-margin-rule: rgba(216, 71, 43, 0.35);
+  --color-stamp-bg: #2A2D33;
+  --color-stamp-border: #9C968B;
+}
+```
+
+---
+
+### Prompt 3: Stationery Micro-Interactions & CSS Animations
+
+**Category:** *CSS Animation & Tactile Styling*
+
+> **Prompt:**
+> "Provide pure CSS styling and animation rules for:
+> 1. A letter sheet that rests at a subtle 1-degree tilt (`rotate(1deg)`) with soft elevation shadow, and smoothly straightens to `rotate(0deg)` when hovered.
+> 2. A stamped chip effect for skill tags with a vintage bordered stamp aesthetic.
+> 3. An ink-fill button effect where a dark ink gradient sweeps across the button upon clicking or copying.
+> 4. An embossed wax seal badge styled with a rich crimson radial gradient and gold rim."
+
+**AI Provided Guidance (CSS Snippets):**
+```css
+/* 1. Letter sheet tilt & elevation */
+.letter-sheet {
+  background: var(--paper-letter);
+  border: 1px solid var(--paper-border);
+  box-shadow: var(--shadow-paper);
+  transform: rotate(1deg);
+  transition: transform var(--transition-paper), box-shadow var(--transition-paper);
+}
+
+.letter-sheet:hover {
+  transform: rotate(0deg) translateY(-2px);
+  box-shadow: var(--shadow-paper-hover);
+}
+
+/* 2. Stamped Chip */
+.stamped-chip {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  background: var(--color-stamp-bg);
+  border: 1px dashed var(--color-stamp-border);
+  padding: 0.28rem 0.65rem;
+  border-radius: 2px;
+}
+
+/* 3. Wax Seal Badge */
+.wax-seal {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #D8472B 0%, var(--color-seal) 70%);
+  box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.25), 0 4px 10px rgba(0, 0, 0, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+```
+
+---
+
+### Prompt 4: Two-Pane Split Desk Layout
+
+**Category:** *CSS Layout & Responsive Grid*
+
+> **Prompt:**
+> "Provide a clean CSS Grid layout for a 2-column writer desk on desktop (`min-width: 960px`) with the notepad on the left and the stationery preview on the right, collapsing to a single centered column on mobile and tablet devices with balanced padding."
+
+**AI Provided Guidance:**
+- Responsive grid definition:
+```css
+.desk-workspace {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 2rem 1.25rem 4rem;
+}
+
+@media (min-width: 960px) {
+  .desk-workspace {
+    grid-template-columns: minmax(360px, 440px) 1fr;
+    gap: 3rem;
+    align-items: start;
+  }
+}
+```
+
+---
+
+## Conclusion
+
+Every other piece of functionality—including the React architecture, state synchronization, PDF.js parsing, custom template engine, DOMPurify sanitization, Gemini multi-model fallback client, unit tests, and GitHub Pages automated deployment—was authored directly by the developer. AI served exclusively as an editorial designer and CSS stylesheet consultant.

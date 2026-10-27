@@ -1,23 +1,3 @@
-/**
- * Inkwell — Prompt Engineering Engine
- *
- * Programmatically constructs an artisanal, high-fidelity system prompt and user brief
- * for Google Gemini. Sets the coach persona, editorial structure (hook, proof, fit, close),
- * and enforces a strict ban on buzzwords and placeholders.
- */
-
-/**
- * Builds the system instructions and user prompt for Gemini cover letter generation.
- *
- * @param {Object} params
- * @param {string} params.name - Candidate full name
- * @param {string} params.role - Target craft/role
- * @param {string} params.company - Target organization
- * @param {string[]|string} params.skills - List of key skills or comma-separated string
- * @param {string} [params.resumeText] - Optional extracted resume text
- * @param {string} [params.tone='confident'] - Tone: 'confident' | 'warm' | 'formal'
- * @returns {{ systemInstruction: string, userPrompt: string }}
- */
 export function buildCoverLetterPrompt({
   name,
   role,

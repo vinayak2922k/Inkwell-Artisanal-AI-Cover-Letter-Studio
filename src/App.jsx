@@ -11,15 +11,12 @@ import { generateCoverLetter } from './lib/gemini';
 const HISTORY_STORAGE_KEY = 'inkwell_history';
 
 export function App() {
-  // Theme state: daylight or dark charcoal desk
   const [theme, setTheme] = useState(() => {
     return localStorage.getItem('inkwell_theme') || 'light';
   });
 
-  // Generation mode: 'template' | 'ai'
   const [mode, setMode] = useState('template');
 
-  // Single controlled form object in React state
   const [formData, setFormData] = useState({
     name: 'Eleanor Vance',
     role: 'Lead Product Architect',
@@ -29,10 +26,8 @@ export function App() {
     resumeText: '',
   });
 
-  // Attached PDF resume docket
   const [currentResume, setCurrentResume] = useState(null);
 
-  // Drafts history from localStorage
   const [history, setHistory] = useState(() => {
     try {
       const saved = localStorage.getItem(HISTORY_STORAGE_KEY);
@@ -48,13 +43,11 @@ export function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [apiError, setApiError] = useState(null);
 
-  // Sync theme to DOM data-theme attribute
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
     localStorage.setItem('inkwell_theme', theme);
   }, [theme]);
 
-  // Sync history to localStorage
   useEffect(() => {
     try {
       localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(history));
@@ -63,7 +56,6 @@ export function App() {
     }
   }, [history]);
 
-  // Initial letter generation on mount with demo values
   useEffect(() => {
     const initialLetter = buildTemplateLetter(formData);
     setLetterText(initialLetter);
@@ -101,7 +93,7 @@ export function App() {
       letterText: text,
       mode: mode,
     };
-    setHistory((prev) => [newEntry, ...prev.slice(0, 19)]); // store up to 20 past drafts
+    setHistory((prev) => [newEntry, ...prev.slice(0, 19)]);
   };
 
   const handleRestoreFromHistory = (item) => {
@@ -150,7 +142,6 @@ export function App() {
     setIsLoading(true);
 
     if (mode === 'template') {
-      // Natural typewriter delay for template mode
       setTimeout(() => {
         const generated = buildTemplateLetter(formData);
         setLetterText(generated);
@@ -160,7 +151,6 @@ export function App() {
       return;
     }
 
-    // AI Mode via Gemini
     try {
       const generated = await generateCoverLetter({
         name: formData.name,
@@ -244,7 +234,6 @@ export function App() {
 
       <Footer />
 
-      {/* LocalStorage History Drawer */}
       <HistoryDrawer
         isOpen={isHistoryOpen}
         onClose={() => setIsHistoryOpen(false)}

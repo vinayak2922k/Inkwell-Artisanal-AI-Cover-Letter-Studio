@@ -9,10 +9,6 @@ const STATUS_LINES = [
   'Applying the warm wax seal to the parchment...',
 ];
 
-/**
- * InkLoader displays a pen-writing / ink-drip animation
- * with rotating stationery status lines while Gemini authors the letter.
- */
 export function InkLoader() {
   const [currentLineIndex, setCurrentLineIndex] = useState(0);
 

@@ -1,9 +1,5 @@
 import React from 'react';
 
-/**
- * DeskBanner displays subtle, informative context about the active mode
- * and whether a Gemini API key is detected.
- */
 export function DeskBanner({ mode, hasApiKey }) {
   if (mode === 'template') {
     return (
@@ -12,7 +8,7 @@ export function DeskBanner({ mode, hasApiKey }) {
           <span className="desk-banner__dot" style={{ backgroundColor: '#2E7D32' }} />
           <span><strong>Template Mode Active:</strong> Instant offline generation using Inkwell's editorial stationery engine.</span>
         </div>
-        <span style={{ opacity: 0.75 }}>Phase 1 Base MVP</span>
+        <span style={{ opacity: 0.75 }}>Offline Ready</span>
       </div>
     );
   }

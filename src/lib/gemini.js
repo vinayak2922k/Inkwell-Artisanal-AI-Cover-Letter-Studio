@@ -1,14 +1,6 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { buildCoverLetterPrompt } from './prompt.js';
 
-/**
- * Inkwell — Gemini API Client
- *
- * Secure client for generating artisanal cover letters using Google Gemini.
- * Never logs or prints the API key. Supports multi-model fallback across
- * modern flash models, 429 rate limits, and network errors.
- */
-
 export class GeminiError extends Error {
   constructor(message, code, details) {
     super(message);
@@ -18,7 +10,6 @@ export class GeminiError extends Error {
   }
 }
 
-// Ordered list of candidate models for resilience across Google AI Studio tiers
 const CANDIDATE_MODELS = [
   'gemini-flash-lite-latest',
   'gemini-3-flash-preview',
@@ -26,18 +17,6 @@ const CANDIDATE_MODELS = [
   'gemini-1.5-flash',
 ];
 
-/**
- * Calls Google Gemini to author a bespoke cover letter.
- *
- * @param {Object} params
- * @param {string} params.name - Candidate name
- * @param {string} params.role - Target job role
- * @param {string} params.company - Target organization
- * @param {string[]|string} params.skills - Skills list or comma-separated string
- * @param {string} [params.resumeText] - Optional resume summary text
- * @param {string} [params.tone='confident'] - Tone of the letter
- * @returns {Promise<string>} Clean cover letter text
- */
 export async function generateCoverLetter({
   name,
   role,
@@ -65,7 +44,6 @@ export async function generateCoverLetter({
   });
 
   try {
-    // 30-second timeout controller
     const timeoutPromise = new Promise((_, reject) =>
       setTimeout(
         () =>
@@ -83,7 +61,6 @@ export async function generateCoverLetter({
       const cleanKey = apiKey.trim();
       let lastError = null;
 
-      // Try SDK first across candidate models
       for (const modelName of CANDIDATE_MODELS) {
         try {
           const genAI = new GoogleGenerativeAI(cleanKey);
@@ -105,11 +82,9 @@ export async function generateCoverLetter({
           }
         } catch (err) {
           lastError = err;
-          // Continue to next model on 404/503/400
         }
       }
 
-      // If SDK pass fails, attempt direct REST fallback with candidate models
       return await callGeminiViaRest(cleanKey, systemInstruction, userPrompt, lastError);
     })();
 
@@ -153,9 +128,6 @@ export async function generateCoverLetter({
   }
 }
 
-/**
- * Direct REST fallback for Google Gemini v1beta endpoint with model rotation
- */
 async function callGeminiViaRest(apiKey, systemInstruction, userPrompt, previousError) {
   let lastResponseText = '';
 
@@ -204,7 +176,6 @@ async function callGeminiViaRest(apiKey, systemInstruction, userPrompt, previous
       }
     } catch (e) {
       if (e instanceof GeminiError) throw e;
-      // continue to next model
     }
   }
 

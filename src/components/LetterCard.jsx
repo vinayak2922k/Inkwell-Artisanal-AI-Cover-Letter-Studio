@@ -3,11 +3,6 @@ import { InkLoader } from './InkLoader';
 import { ErrorNotice } from './ErrorNotice';
 import { formatLetterContent } from '../lib/markdown';
 
-/**
- * LetterCard displays the finalized cover letter on an artisanal stationery sheet,
- * styled with subtle paper grain, 1° tilt that straightens on hover, wax seal badge,
- * sanitized markdown-to-HTML rendering, and ink-fill copy button with fallback.
- */
 export function LetterCard({
   letterText,
   candidateName,
@@ -22,7 +17,6 @@ export function LetterCard({
 }) {
   const [copied, setCopied] = useState(false);
 
-  // Fallback clipboard copying for environments without navigator.clipboard
   const copyToClipboard = async () => {
     if (!letterText) return;
 
@@ -37,7 +31,6 @@ export function LetterCard({
     }
 
     if (!successful) {
-      // Fallback via temporary textarea
       const textArea = document.createElement('textarea');
       textArea.value = letterText;
       textArea.style.position = 'fixed';
@@ -75,7 +68,6 @@ export function LetterCard({
     URL.revokeObjectURL(url);
   };
 
-  // Convert model's markdown into clean, sanitized HTML paragraphs via DOMPurify
   const sanitizedHtml = letterText ? formatLetterContent(letterText) : '';
   const wordCount = letterText ? letterText.trim().split(/\s+/).filter(Boolean).length : 0;
   const formattedDate = new Intl.DateTimeFormat('en-US', {
@@ -86,7 +78,6 @@ export function LetterCard({
 
   return (
     <section className="letter-stage" aria-label="Letter Preview">
-      {/* If an error occurred during generation, display stationery notice */}
       {error && (
         <ErrorNotice
           error={error}
@@ -96,7 +87,6 @@ export function LetterCard({
       )}
 
       <div className="letter-sheet" id="letter-sheet-card">
-        {/* Stationery Header */}
         <div className="letter-header">
           <div>
             <h2 className="letter-candidate-name">
@@ -112,7 +102,6 @@ export function LetterCard({
           </div>
         </div>
 
-        {/* Dynamic Display: InkLoader while drafting, sanitized prose when ready, or placeholder */}
         {isLoading ? (
           <InkLoader />
         ) : sanitizedHtml ? (
@@ -122,7 +111,6 @@ export function LetterCard({
               dangerouslySetInnerHTML={{ __html: sanitizedHtml }}
             />
 
-            {/* Wax Seal / Stamp badge */}
             <div className="wax-seal" title="Sealed at the Inkwell Desk" aria-hidden="true">
               <span>✒</span>
             </div>
@@ -139,7 +127,6 @@ export function LetterCard({
         )}
       </div>
 
-      {/* Toolbar beneath the paper sheet */}
       {!isLoading && letterText && (
         <div className="letter-toolbar">
           <div className="letter-meta-badge">
@@ -171,7 +158,6 @@ export function LetterCard({
               <span>💾 .txt</span>
             </button>
 
-            {/* Custom ink-fill Copy button */}
             <button
               type="button"
               className={`btn-copy-ink ${copied ? 'copied' : ''}`}

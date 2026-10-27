@@ -1,9 +1,5 @@
 import React from 'react';
 
-/**
- * Header component for Inkwell's writer desk.
- * Includes branding, mode toggle (Template / AI), and theme switcher.
- */
 export function Header({
   mode,
   onModeChange,
@@ -24,7 +20,6 @@ export function Header({
         </div>
 
         <div className="desk-actions">
-          {/* Mode Switcher */}
           <div className="mode-toggle" role="group" aria-label="Generation Mode">
             <button
               id="mode-btn-template"
@@ -46,7 +41,6 @@ export function Header({
             </button>
           </div>
 
-          {/* Archives Drawer Button */}
           <button
             id="open-history-btn"
             type="button"
@@ -58,7 +52,6 @@ export function Header({
             <span>🗄️ Archives {historyCount > 0 ? `(${historyCount})` : ''}</span>
           </button>
 
-          {/* Theme Switcher */}
           <button
             id="theme-toggle-btn"
             type="button"

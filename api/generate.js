@@ -1,9 +1,3 @@
-/**
- * Serverless API Proxy for Vercel / Netlify / Cloud Functions
- *
- * Route: POST /api/generate
- * Keeps GEMINI_API_KEY securely on the server side in production.
- */
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method Not Allowed. Use POST.' });

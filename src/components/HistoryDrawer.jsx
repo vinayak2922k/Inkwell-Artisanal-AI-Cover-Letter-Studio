@@ -1,9 +1,5 @@
 import React from 'react';
 
-/**
- * HistoryDrawer allows viewing and restoring previously penned letters
- * saved in browser localStorage.
- */
 export function HistoryDrawer({ isOpen, onClose, history = [], onRestore, onClear }) {
   if (!isOpen) return null;
 

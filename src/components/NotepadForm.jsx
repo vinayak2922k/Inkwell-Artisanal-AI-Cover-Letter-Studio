@@ -1,10 +1,6 @@
 import React, { useState } from 'react';
 import { ResumeDropzone } from './ResumeDropzone';
 
-/**
- * NotepadForm renders a vintage notepad stationery sheet with underlined inputs,
- * real human microcopy, stamped skill tags, PDF resume docket, and validation.
- */
 export function NotepadForm({
   formData,
   onChange,
@@ -53,7 +49,6 @@ export function NotepadForm({
 
   return (
     <aside className="notepad-sheet" aria-labelledby="notepad-heading">
-      {/* Top brass/leather binding strip */}
       <div className="notepad-binding">
         <span>Desk Notepad · No. 04</span>
         <span className="notepad-binding__perforation">┈┈┈┈┈┈┈┈┈┈┈┈┈</span>
@@ -67,7 +62,6 @@ export function NotepadForm({
         </p>
 
         <form onSubmit={onSubmit} noValidate>
-          {/* Candidate Name */}
           <div className="form-field">
             <label htmlFor="field-name" className="form-field__label">
               Who’s the letter from?
@@ -90,7 +84,6 @@ export function NotepadForm({
             )}
           </div>
 
-          {/* Target Role */}
           <div className="form-field">
             <label htmlFor="field-role" className="form-field__label">
               What craft are you bringing?
@@ -113,7 +106,6 @@ export function NotepadForm({
             )}
           </div>
 
-          {/* Target Company */}
           <div className="form-field">
             <label htmlFor="field-company" className="form-field__label">
               Where are you aiming?
@@ -136,7 +128,6 @@ export function NotepadForm({
             )}
           </div>
 
-          {/* Key Skills Tags */}
           <div className="form-field">
             <label htmlFor="field-skills" className="form-field__label">
               Key Skills & Specialties
@@ -183,14 +174,12 @@ export function NotepadForm({
             )}
           </div>
 
-          {/* Resume PDF Docket Dropzone */}
           <ResumeDropzone
             onResumeExtracted={onResumeExtracted}
             onResumeRemoved={onResumeRemoved}
             currentResume={currentResume}
           />
 
-          {/* Tone Selector */}
           <div className="form-field" style={{ marginTop: '1.5rem' }}>
             <label className="form-field__label">Tone of Voice</label>
             <span className="form-field__microcopy">Set the temper of the parchment</span>
@@ -210,7 +199,6 @@ export function NotepadForm({
             </div>
           </div>
 
-          {/* Action button */}
           <div className="notepad-actions">
             <button
               type="submit"

@@ -1,9 +1,5 @@
 import React from 'react';
 
-/**
- * ErrorNotice provides a thoughtful, stationery-styled error message
- * with retry action and mode switch recommendation.
- */
 export function ErrorNotice({ error, onRetry, onSwitchToTemplate }) {
   if (!error) return null;
 

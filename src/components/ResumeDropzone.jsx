@@ -1,11 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { extractTextFromPdf } from '../lib/pdfExtractor';
 
-/**
- * ResumeDropzone provides a stationery-styled docket dropzone for PDF resumes.
- * Supports drag and drop, file browsing, validation (PDF only, max 5 MB),
- * extraction progress, and chip removal.
- */
 export function ResumeDropzone({ onResumeExtracted, onResumeRemoved, currentResume }) {
   const [isDragging, setIsDragging] = useState(false);
   const [isExtracting, setIsExtracting] = useState(false);
@@ -57,7 +52,6 @@ export function ResumeDropzone({ onResumeExtracted, onResumeRemoved, currentResu
     if (files && files[0]) {
       handleProcessFile(files[0]);
     }
-    // Reset file input so selecting the same file triggers change
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -84,7 +78,6 @@ export function ResumeDropzone({ onResumeExtracted, onResumeRemoved, currentResu
         Drop a PDF to enrich the letter with real accomplishments from your career
       </span>
 
-      {/* Hidden file input */}
       <input
         ref={fileInputRef}
         type="file"
@@ -95,7 +88,6 @@ export function ResumeDropzone({ onResumeExtracted, onResumeRemoved, currentResu
         disabled={isExtracting}
       />
 
-      {/* Render File Chip when resume is attached */}
       {currentResume && currentResume.fileName ? (
         <div className="resume-chip" role="status">
           <div className="resume-chip__info">
@@ -122,7 +114,6 @@ export function ResumeDropzone({ onResumeExtracted, onResumeRemoved, currentResu
           </button>
         </div>
       ) : (
-        /* Dropzone Docket */
         <div
           className={`dropzone-box ${isDragging ? 'dragging' : ''} ${isExtracting ? 'extracting' : ''}`}
           onDragOver={handleDragOver}

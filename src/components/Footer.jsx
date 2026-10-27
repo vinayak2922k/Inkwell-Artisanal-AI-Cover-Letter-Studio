@@ -1,10 +1,5 @@
 import React from 'react';
 
-/**
- * Footer component for Inkwell's writer desk.
- * Features developer attribution for Vinayak Sharma with stationery-styled
- * social links (GitHub, LinkedIn, Gmail).
- */
 export function Footer() {
   const currentYear = new Date().getFullYear();
 
